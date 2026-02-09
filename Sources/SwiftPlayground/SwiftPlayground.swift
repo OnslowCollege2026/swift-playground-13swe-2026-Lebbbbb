@@ -1,6 +1,6 @@
 // The Swift Programming Language
 // https://docs.swift.org/swift-book
-
+// swift run
 
 func totalCost(prices: [Double]) -> Double {
     var totalCost1 = 0.0
@@ -8,6 +8,12 @@ func totalCost(prices: [Double]) -> Double {
         totalCost1 += i
     }
     return totalCost1
+}
+
+func isOverBudget(total: Double, budget: Double) -> Bool{
+    var overBudget = false
+    
+    return overBudget
 }
 
 @main
@@ -22,7 +28,7 @@ struct SwiftPlayground {
             print("Day \(day): $\(i)")
         }
 
-
         print ("Total cost: $\(totalCost(prices: lunches))")
+        print ("You are $\(isOverBudget(total: (totalCost(prices: lunches)), budget: 35))")
     }
 }
