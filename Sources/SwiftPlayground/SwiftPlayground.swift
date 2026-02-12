@@ -56,7 +56,10 @@ struct SwiftPlayground {
         // Task 2 FIX THIS
         let words = ["apple", "banana", "grape", "strawberry", "kiwi"]
         let wordsLongest = words.reduce("") { 
-            if $0.count > $1 { $0 = $1 }
+            if $0.count > $1.count { $0 = $1 } {
+                
+            }
+        //let wordsLongest = words[1].count
         }
         print (wordsLongest)
     }
