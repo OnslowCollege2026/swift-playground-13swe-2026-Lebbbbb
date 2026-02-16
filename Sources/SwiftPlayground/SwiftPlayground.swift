@@ -78,7 +78,5 @@ struct SwiftPlayground {
         let scoresAverage = scoresFilter
         .reduce(0) { $0 + $1 } / (scoresFilter.count)
         print (scoresAverage)
-
-        //print("\nOther Closures")
     }
 }
