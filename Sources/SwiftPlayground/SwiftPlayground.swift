@@ -60,7 +60,7 @@ struct SwiftPlayground {
                 [["riddle", "echo"], ["ember", "glyph"]],
             ],
         ]
-
+        
         //let lastWing = archive.filter {  }
         //print (lastWing)
         //print (archive.flatMap { $0.flatMap { $0.flatMap { $0 } } })
@@ -70,6 +70,8 @@ struct SwiftPlayground {
 
         //print (archive.compactMap { $0.compactMap { $0.compactMap { $0.first } }})
 
+
+        /* THIS SUCKS ITS NOT THE RIGHT WAY!!!
         var archiveIndex: [Int] = []
         // Finds the last wing with word starting with "e"
         for (index, _) in archive.enumerated() {
@@ -109,6 +111,6 @@ struct SwiftPlayground {
             }
         }
 
-        print (archive[archiveIndex[0]][archiveIndex[1]][archiveIndex[2]]/*[archiveIndex[3]]*/)
+        print (archive[archiveIndex[0]][archiveIndex[1]][archiveIndex[2]]/*[archiveIndex[3]]*/)*/
     }
 }
