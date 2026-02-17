@@ -69,23 +69,46 @@ struct SwiftPlayground {
         //print (test)
 
         //print (archive.compactMap { $0.compactMap { $0.compactMap { $0.first } }})
-        var lastWingE: [Int] = []
+
+        var archiveIndex: [Int] = []
+        // Finds the last wing with word starting with "e"
         for (index, _) in archive.enumerated() {
-            //print ("\(item) \(index)")
             for (index1, _) in archive[index].enumerated() {
-                //print ("\(item) \(index1)")
                 for (index2, _) in archive[index][index1].enumerated() {
-                    //print ("\(item) \(index2)")
                     for (index3, _) in archive[index][index1][index2].enumerated() {
-                        //print (archive[index][index1][index2][index3].last )
-                        //let  archive[index][index1][index2][index3].first == "e"
                         if ((archive[index][index1][index2][index3]).first) == "e" {
-                            lastWingE = [index, index1, index2, index3]
+                            archiveIndex.append (index + 1)
                         }
                     }
                 }
             }
         }
-        print (archive[lastWingE[0]][lastWingE[1]][lastWingE[2]][lastWingE[3]])
+
+        // Finds last room with word with 4 char
+        for (index, _) in archive[archiveIndex[0]].enumerated() {
+            for (index1, _) in archive[archiveIndex[0]][index].enumerated() {
+                for (index2, item) in archive[archiveIndex[0]][index][index1].enumerated() {
+                    if item.count == 4 {
+                        archiveIndex[1] = index2
+                    }
+                }
+            }
+        }
+        for (index, _) in archive[archiveIndex[0]][archiveIndex[1]].enumerated() {
+            for (index1, item) in archive[archiveIndex[0]][archiveIndex[1]][index].enumerated() {
+                if item.first == "e" {
+                    archiveIndex[2] = index1
+                }
+            }
+        }
+
+        for (index, item) in archive[archiveIndex[0]][archiveIndex[1]][archiveIndex[2]].enumerated() {
+            if item.first == "e" {
+                archiveIndex[3] = index
+                //print (item)
+            }
+        }
+
+        print (archive[archiveIndex[0]][archiveIndex[1]][archiveIndex[2]]/*[archiveIndex[3]]*/)
     }
 }
