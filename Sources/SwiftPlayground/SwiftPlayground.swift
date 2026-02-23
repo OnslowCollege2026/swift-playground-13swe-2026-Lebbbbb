@@ -44,10 +44,22 @@ struct Rectangle {
     }
 }
 
+// Instalizing here so struct can access it
+let difficulties = ["Easy", "Medium", "Hard", "Expert"]
+struct Quest {
+    let title: String
+    let difficulty: Int
+    let reward: String
+
+    func printbadge() -> String {
+        return("\(title) - \(difficulties[difficulty - 1]) Quest - \(reward)")
+    }
+}
 
 @main
 struct SwiftPlayground {
     static func main() {
+        
         // define students
         let students = [
             Student(id: "22810",name: "Leb",age: 16,nsn: "0144001856",email: "leb.foden@student.onslow.school.nz"),
@@ -91,12 +103,29 @@ struct SwiftPlayground {
             Rectangle(width: 3.5, height: 6.5)
         ]
         var rectangleAreas: [Double] = []
-        for (rect) in rectangles {
-            //print(rect.area())
+        // Adds all the areas of the rectangles to an array
+        for rect in rectangles {
             rectangleAreas.append (rect.area())
         }
-        print(rectangleAreas)
+        
         rectangleAreas.sort(by: >)
-        print(rectangleAreas)
+        print("The largest rectangle area is: \(rectangleAreas.first!)cm²")
+
+
+        // Task D
+        print("\nTask D")
+        let quests = [
+            Quest(title: "Escape the Prison", difficulty: 1, reward: "1 Sword"),
+            Quest(title: "Escape from Millie's House", difficulty: 2, reward: "1 Macbook Air"),
+            Quest(title: "Kill the Supreme Leader", difficulty: 3, reward: "1 Unlimited Power")
+        ]
+        var hardestQuest = 0
+        for (index, quest) in quests.enumerated() {
+            print (quest.printbadge())
+            if quests[index].difficulty >= quests[hardestQuest].difficulty {
+                hardestQuest = index
+            }
+        }
+        print("The Hardest quest is \"\(quests[hardestQuest].title)\" being a \(difficulties[quests[hardestQuest].difficulty - 1]) Quest")
     }
 }
