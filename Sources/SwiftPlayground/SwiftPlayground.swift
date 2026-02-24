@@ -30,7 +30,7 @@ struct SwiftPlayground {
             sightings
             .filter { ($0).name.first == "w" || ($0).name.first == "m" }
             .map { $0.score }
-            .reduce(0) { $0 + $1 }
+            .reduce(0, +) /*{ $0 + $1 }*/
         print(sightingsFilterd)
 
         // Task 3
@@ -61,6 +61,9 @@ struct SwiftPlayground {
             ],
         ]
         
+
+
+        // || ill leave all my failed attempts below ||
         //let lastWing = archive.filter {  }
         //print (lastWing)
         //print (archive.flatMap { $0.flatMap { $0.flatMap { $0 } } })
@@ -71,7 +74,7 @@ struct SwiftPlayground {
         //print (archive.compactMap { $0.compactMap { $0.compactMap { $0.first } }})
 
 
-        /* THIS SUCKS ITS NOT THE RIGHT WAY!!!
+        /*
         var archiveIndex: [Int] = []
         // Finds the last wing with word starting with "e"
         for (index, _) in archive.enumerated() {
