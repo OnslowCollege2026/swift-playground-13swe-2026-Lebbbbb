@@ -18,12 +18,37 @@ func bookSummary(title: String, author: String, pages: Int) -> String {
 }
 
 struct Temperature {
-    func toFarenheit(celcius: Double) -> Double {
+    static func toFarenheit(celcius: Double) -> Double {
+        return((celcius * 9 / 5) + 32)
+    }
+    static func toCelsius(farenheit: Double) -> Double {
+        return((farenheit - 32) * 5 / 9)
+    }
+}
 
+struct Timer {
+    var seconds: Int
+    var isRunning: Bool
+
+    mutating func start() {
+        isRunning = true
     }
-    func toelcius(farenheit: Double) -> Double {
-        
+
+    mutating func tick() {
+        if isRunning == true {
+            seconds += 1
+        }
     }
+
+    mutating func reset() {
+        seconds = 0
+        isRunning = false
+    }
+}
+
+struct Cart {
+    var itemsCount: Int
+    static let freeShippingThreshold = 5
 }
 
 
@@ -43,5 +68,24 @@ struct SwiftPlayground {
 
         // Task B
         print("\nTask B")
+        print(Temperature.toFarenheit(celcius: 28.6))
+        print(Temperature.toFarenheit(celcius: 10.0))
+        print(Temperature.toCelsius(farenheit: 83.4))
+        print(Temperature.toCelsius(farenheit: 56.3))
+
+        // Task C
+        print("\nTask C")
+        var stopwatch = Timer(seconds: 0, isRunning: false)
+        print(stopwatch)
+        stopwatch.start()
+        print(stopwatch)
+        stopwatch.tick()
+        print(stopwatch)
+        stopwatch.reset()
+        print(stopwatch)
+
+        // Task D
+        print("\nTask D")
+
     }
 }
