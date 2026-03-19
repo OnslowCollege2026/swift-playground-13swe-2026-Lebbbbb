@@ -2,15 +2,16 @@
 // https://docs.swift.org/swift-book
 // swift run
 import Foundation
-import GRDB
+//import GRDB
 
 
 @main
 struct SwiftPlayground {
     static func main() {
-        let dbPath = "./cafe.db"
-        guard let dbQueue = try DatabaseQueue(path: dbPath) else {
-            fatalError("Could not open database.")
-        }
+        //let dbPath = "./cafe.db"
+        //guard let dbQueue = try DatabaseQueue(path: dbPath) else {
+        //    fatalError("Could not open database.")
+        //}
+        print("test")
     }
 }
