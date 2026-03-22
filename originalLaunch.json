@@ -1,37 +1,10 @@
-/*{
-    "configurations": [
-        {
-            "type": "swift",
-            "request": "launch",
-            "args": [],
-            "cwd": "${workspaceFolder:swift-playground-13swe-2026-Lebbbbb}",
-            "name": "Debug SwiftPlayground",
-            "target": "SwiftPlayground",
-            "configuration": "debug",
-            "preLaunchTask": "swift: Build Debug SwiftPlayground"
-        },
-        {
-            "type": "swift",
-            "request": "launch",
-            "args": [],
-            "cwd": "${workspaceFolder:swift-playground-13swe-2026-Lebbbbb}",
-            "name": "Release SwiftPlayground",
-            "target": "SwiftPlayground",
-            "configuration": "release",
-            "preLaunchTask": "swift: Build Release SwiftPlayground"
-        }
-    ]
-}*/
-
-
-
 {
     "configurations": [
         {
             "type": "swift",
             "request": "launch",
             "args": [],
-            "cwd": "${workspaceFolder:swift-playground-13swe-2026-Lebbbbb}",
+            "cwd": "${workspaceFolder:SwiftPlayground}",
             "name": "Debug SwiftPlayground",
             "target": "SwiftPlayground",
             "configuration": "debug",
@@ -46,7 +19,7 @@
             "type": "swift",
             "request": "launch",
             "args": [],
-            "cwd": "${workspaceFolder:swift-playground-13swe-2026-Lebbbbb}",
+            "cwd": "${workspaceFolder:SwiftPlayground}",
             "name": "Release SwiftPlayground",
             "target": "SwiftPlayground",
             "configuration": "release",
