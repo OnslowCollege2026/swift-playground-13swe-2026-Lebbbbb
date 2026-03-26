@@ -7,6 +7,9 @@ import GRDB
 @main
 struct SwiftPlayground {
     static func main() {
-        print("Hello, world!")
+        let dbPath = "./Sources/SwiftPlayground/cafe.db"
+            guard let dbQueue = try? DatabaseQueue(path: dbPath) else {
+                fatalError("Could not open database.")
+            }
     }
 }
