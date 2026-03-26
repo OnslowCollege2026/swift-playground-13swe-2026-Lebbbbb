@@ -8,8 +8,8 @@ import GRDB
 struct SwiftPlayground {
     static func main() {
         let dbPath = "./Sources/SwiftPlayground/cafe.db"
-            guard let dbQueue = try? DatabaseQueue(path: dbPath) else {
-                fatalError("Could not open database.")
-            }
+        guard let dbQueue = try? DatabaseQueue(path: dbPath) else {
+            fatalError("Could not open database.")
+        }
     }
 }
