@@ -55,12 +55,53 @@ struct SwiftPlayground {
                 //try db.dumpSchema()
                 purchaser = try Purchaser.fetchOne(db, key: 1)
                 print(purchaser)
-                purchaser = try Purchaser.fetchOne(db, key: 3)
-                print(purchaser)
             }
         } catch {
-            print("error")
+            print(error)
         }
+
+
+        // "does purchaser exist?"
+        if var purchaser {
+            purchaser.count = 5000
+            do {
+                try dbQueue.write { db in
+                    try purchaser.update(db)
+                }
+            } catch {
+                print(error)
+            }
+        }
+
+        do {
+            try dbQueue.read { db in
+                let spesficPurchaser = try Purchaser
+                    .filter(Purchaser.Columns.name == "Leb Foden")
+                    .fetchOne(db)
+                if let spesficPurchaser {
+                    print("Found by name: \(spesficPurchaser.name)")
+                } else {
+                    print("No match for name")
+                }
+            }
+        } catch {
+            print(error)
+        }
+
+        do {
+            try dbQueue.read { db in
+                let groups = try Purchaser
+                    .filter(Purchaser.Columns.count > 1)
+                    .fetchAll(db)
+
+                for group in groups {
+                    print("\(group.name) has \(group.count) people")
+                }
+            }
+        } catch {
+            print(error)
+        }
+
 
     }
 }
