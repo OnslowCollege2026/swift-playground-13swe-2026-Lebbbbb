@@ -1,11 +1,119 @@
 // The Swift Programming Language
 // https://docs.swift.org/swift-book
 // swift run
+import Foundation
+import GRDB
+
+/// hello everyoneaaaaa
+struct Purchaser: Identifiable, Codable, FetchableRecord, PersistableRecord {
+    let id: Int
+    var name: String
+    var count: Int
+    var reservedTable: Int
+
+    enum CodingKeys: String, CodingKey {
+        case id = "PurchaserID"
+        case name = "Name"
+        case count = "Count"
+        case reservedTable = "ReservedTable"
+    }
+
+    enum Columns {
+        static let id = Column("PurchaserID")
+        static let name = Column("Name")
+        static let count = Column("Count")
+        static let reservedTable = Column("ReservedTable")
+    }
+}
+
+struct OrderLine: Codable, FetchableRecord, PersistableRecord {
+    let orderID: Int
+    let itemID: Int
+    let quantity: Int
+
+    enum Columns {
+        static let orderID = Column("OrderID")
+        static let itemID = Column("ItemID")
+        static let quantity = Column("Quantity")
+    }
+}
 
 
 @main
 struct SwiftPlayground {
     static func main() {
-        print("Hello, world!")
+        let dbPath = "./Sources/SwiftPlayground/cafe.db"
+        guard let dbQueue = try? DatabaseQueue(path: dbPath) else {
+            fatalError("Could not open database.")
+        }
+
+        var purchaser: Purchaser? = nil
+
+        do {
+            try dbQueue.read { db in
+                //try db.dumpSchema()
+                purchaser = try Purchaser.fetchOne(db, key: 1)
+                print(purchaser)
+            }
+        } catch {
+            print(error)
+        }
+
+
+        // "does purchaser exist?"
+        if var purchaser {
+            purchaser.count = 5000
+            do {
+                try dbQueue.write { db in
+                    try purchaser.update(db)
+                }
+            } catch {
+                print(error)
+            }
+        }
+
+        do {
+            try dbQueue.read { db in
+                let spesficPurchaser = try Purchaser
+                    .filter(Purchaser.Columns.name == "Leb Foden")
+                    .fetchOne(db)
+                if let spesficPurchaser {
+                    print("Found by name: \(spesficPurchaser.name)")
+                } else {
+                    print("No match for name")
+                }
+            }
+        } catch {
+            print(error)
+        }
+
+        do {
+            try dbQueue.read { db in
+                let groups = try Purchaser
+                    .filter(Purchaser.Columns.count > 1)
+                    .fetchAll(db)
+
+                for group in groups {
+                    print("\(group.name) has \(group.count) people")
+                }
+            }
+        } catch {
+            print(error)
+        }
+
+        do {
+            try dbQueue.read { db in
+                let orderLine = try OrderLine
+                    .filter(
+                        OrderLine.Columns.itemID == 1 &&
+                        OrderLine.Columns.quantity == 2
+                    )
+                    .fetchOne(db)
+                print(orderLine.orderID)
+            }
+        } catch {
+            print(error)
+        }
+
     }
 }
