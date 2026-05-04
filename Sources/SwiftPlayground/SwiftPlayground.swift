@@ -19,7 +19,6 @@ round(value * 100) / 100.0
 struct Instrument {
     let id: Int
     var type: String
-    var price: Double
     var totalStock: Int
     var rented: Int
     var broken: Int
@@ -29,12 +28,16 @@ struct Instrument {
         return totalStock - rented
     }
 
+    var totalUnavalable: Int {
+        return rented + broken
+    }
+
     func instrumentSummary(totalOrAval: String) -> String {
         //return("\(id+1). A \(type) costs $\(price) per day. We have \(totalStock - rented - broken) avalable, \(rented) rented & \(broken) broken units")
         if totalOrAval == "avalable" {
-            return("\(id+1). \(type) costs $\(price) per day. \(totalStock - rented - broken) avalable, \(rented) rented & \(broken) broken units")
+            return("\(id+1). \(type) has \(totalStock - rented - broken) avalable currently, \(rented) rented & \(broken) broken units")
         } else if totalOrAval == "total" {
-            return("\(id+1). \(type) costs $\(price) per day. \(totalStock) total, \(rented) rented & \(broken) broken units")
+            return("\(id+1). \(type) has \(totalStock) total, \(rented) rented & \(broken) broken units")
         } else {
             print("CODE ERROR. instrumentSummary() passed incorrect information.")
             return("")
@@ -70,10 +73,10 @@ struct SwiftPlayground {
         var contin = false
 
         var instruments = [
-            Instrument(id: 0, type: "Acoustic Guitar", price: 10.0, totalStock: 20, rented: 4, broken: 1),
-            Instrument(id: 1, type: "Electric Guitar", price: 25, totalStock: 6, rented: 1, broken: 0)]
+            Instrument(id: 0, type: "Acoustic Guitar", totalStock: 20, rented: 4, broken: 1),
+            Instrument(id: 1, type: "Electric Guitar", totalStock: 6, rented: 1, broken: 0)]
 
-        let instProp = ["id", "name", "price", "total stock", "rented", "broken"]
+        //let instProp = ["id", "name", "price", "total stock", "rented", "broken"]
 
 
         mainMenu()
@@ -156,48 +159,6 @@ struct SwiftPlayground {
                         }
                     }
 
-                    //print("DEBUG! \(instruments[Int(selIndex)! - 1].type)") // DEBUG!!
-                    contin = false
-                    while contin == false {
-                        print ("\nPlease enter a new price. Leave blank to leave it as $\(instruments[Int(selIndex)! - 1].price).")
-                        userText = readLine()!
-                        if userText == "" {
-                            contin = true
-                        } else if typeCheck(inputSTR: userText, type: "Double") == false {
-                            print ("Please enter a whole or decimal number above 0.")
-                        } else if typeCheck(inputSTR: userText, type: "Double") == true {
-                            if Double(userText)! > 0 {
-                                instruments[Int(selIndex)! - 1].price = Double(userText)!
-                                contin = true
-                            } else {
-                                print ("Please enter a whole or decimal number above 0.")
-                            }
-                        }
-                        /*else {
-                            instruments[Int(selIndex)! - 1].price = Double(userText)!
-                            contin = true
-                        }*/
-                    }
-
-                    print("DEBUG! \(instruments[Int(selIndex)! - 1].price)")
-                    contin = false
-                    while contin == false {
-                        print ("\nPlease enter a new total stock amount. Leave blank to leave it as \(instruments[Int(selIndex)! - 1].totalStock).")
-                        userText = readLine()!
-                        if userText == "" {
-                            contin = true
-                        } else if typeCheck(inputSTR: userText, type: "Int") == false {
-                            print ("Please enter a whole number above 0.")
-                        } else if typeCheck(inputSTR: userText, type: "Int") == true {
-                            if Int(userText)! >= 0 {
-                                instruments[Int(selIndex)! - 1].totalStock = Int(userText)!
-                                contin = true
-                            } else {
-                                print ("Please enter a whole number above 0.")
-                            }
-                        }
-                    }
-
                     contin = false
                     while contin == false {
                         print ("\nPlease enter a new amount of broken units. Leave blank to leave it as \(instruments[Int(selIndex)! - 1].broken).")
@@ -205,26 +166,46 @@ struct SwiftPlayground {
                         if userText == "" {
                             contin = true
                         } else if typeCheck(inputSTR: userText, type: "Int") == false {
-                            print ("Please enter a whole number above 0.")
+                            print ("Please enter a whole positive number.")
                         } else if typeCheck(inputSTR: userText, type: "Int") == true {
                             if Int(userText)! >= 0 {
-                                if Int(userText)! > (instruments[Int(selIndex)!].totalStock - instruments[Int(selIndex)!].rented) {
-                                    print ("Cannot enter number higher than total avalable stock (\(instruments[Int(selIndex)!].totalNotRented))")
+                                if Int(userText)! > (instruments[Int(selIndex)! - 1].totalStock - instruments[Int(selIndex)! - 1].rented) {
+                                    print ("Cannot enter number higher than total avalable stock (\(instruments[Int(selIndex)! - 1].totalNotRented))")
                                 } else {
                                     instruments[Int(selIndex)! - 1].broken = Int(userText)!
                                     contin = true
                                 }
                             } else if Int(userText)! < 0 {
-                                print ("Please enter a whole number above 0.")
+                                print ("Please enter a whole positive number.")
                             }
                         }
                     }
+
+                    contin = false
+                    while contin == false {
+                        print ("\nPlease enter a new total stock amount. Leave blank to leave it as \(instruments[Int(selIndex)! - 1].totalStock).")
+                        userText = readLine()!
+                        if userText == "" {
+                            contin = true
+                        } else if typeCheck(inputSTR: userText, type: "Int") == false {
+                            print ("Please enter a whole positive number.")
+                        } else if typeCheck(inputSTR: userText, type: "Int") == true {
+                            if Int(userText)! - instruments[Int(selIndex)! - 1].totalUnavalable >= 0 {
+                                instruments[Int(selIndex)! - 1].totalStock = Int(userText)!
+                                contin = true
+                            } else {
+                                print("New stock cannot be below 0 or total unavalable units. (\(instruments[Int(selIndex)! - 1].totalUnavalable))")
+                            }
+                        }
+                    }
+
                 } else {
                     print("Please enter a valid entry.")
                 }
             } else {
                 print("Please enter a valid entry.")
             }
+            //print("DEBUG \(instruments[0].instrumentSummary(totalOrAval: "avalable"))")
         }
 
 
