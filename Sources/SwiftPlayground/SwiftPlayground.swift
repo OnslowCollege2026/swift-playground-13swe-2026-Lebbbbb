@@ -17,6 +17,7 @@ round(value * 100) / 100.0
 
 /// Instrument type and stock
 struct Instrument {
+    // i keep id for list printing. Its simpler to me
     let id: Int
     var type: String
     var totalStock: Int
@@ -76,6 +77,8 @@ struct SwiftPlayground {
             Instrument(id: 0, type: "Acoustic Guitar", totalStock: 20, rented: 4, broken: 1),
             Instrument(id: 1, type: "Electric Guitar", totalStock: 6, rented: 1, broken: 0)]
 
+        var tempList: [Any] = [-1, "TEMP", -1, -1, -1]
+
         //let instProp = ["id", "name", "price", "total stock", "rented", "broken"]
 
 
@@ -119,7 +122,7 @@ struct SwiftPlayground {
                 switch readLine() {
                     case "1": stockSummary()
                     case "2": modifyInstrument()
-                    case "3": print("Add new instrument")
+                    case "3": addInstrument()
                     case "4": print("Remove instrument")
                     case "5": mainMenu()
                     default: print("Please enter one of the options listed.\n")
@@ -209,14 +212,37 @@ struct SwiftPlayground {
         }
 
 
-// this is just an idea to see if making this into 1 function is cleaner
-// !!!!!!!!! how to use string as input in place of .type
-        func instEdit(action: String, instIndex: Int, cell: String, inputType: String) {
-            if action == "Modify" {
-                //print("Please enter the new  for \(instruments[instIndex].cell)")
+        func addInstrument() {
+            print("\nCreating a new instrument")
+            contin = false
+            while contin == false {
+                print("Name:", terminator: " ")
+                userText = readLine()!
+                if userText.count == 0 || userText.count > maxName {
+                    print("Name must be between 0 and \(maxName + 1) characters\n")
+                } else {
+                    tempList[1] = userText
+                    contin = true
+                }
             }
-        }
+            contin = false
+            while contin == false {
+                print("Stock:", terminator: " ")
+                userText = readLine()!
+                if typeCheck(inputSTR: userText, type: "Int") == true {
+                    if Int(userText)! >= 0 {
+                        tempList[2] = userText
+                    } else {
+                        print("Stock must be a positive whole number")
+                    }
+                } else {
+                    print("Stock must be a positive whole number")
+                }
+            }
+            print(tempList)
 
+            //make confirm screen beofre it saves, ask if user is sure they want one with 0 stock (if 0)
+        }
 
 
         func typeCheck(inputSTR: String, type: String) -> Bool{
@@ -227,7 +253,7 @@ struct SwiftPlayground {
                     return false
                 }
             }
-            if type == "Double" {
+            if type == "Double" { // since removed price double is unused. Keeping it here incase needed
                 if let _ = Double(inputSTR) {
                     return true
                 } else {
