@@ -50,17 +50,21 @@ struct Instrument {
     }
 }
 
-struct Purchaser {
+struct User {
     let id: Int
     var name: String
-    var phoneNum: String
     var email: String
-    var adress: String
+    //var phoneNum: String
+    //var adress: String
+
+    func userSum() -> String {
+        return("\(id+1). \(name), \(email) has  orders") //add order calc when orders made lol
+    }
 }
 
-struct Order {
+struct Loans {
     let id: Int
-    let purchaserID: Int
+    let userID: Int
     ///formatted as [[item, amount],[item, amount]]
     let order: [String]
 }
@@ -88,7 +92,13 @@ struct SwiftPlayground {
         // used to reset back to default
         let instDefault = Instrument(id: -1, name: "", totalStock: 0, rented: 0, broken: 0, family: 0)
 
-        print(tempInst.instType)
+        var tempUser = User(id: 0, name: "", email: "")
+
+
+        var users = [
+            User(id: 0, name: "Leb", email: "leb@leb.com"),
+            User(id: 1, name: "Millie", email: "millie@millie.com")]
+
         mainMenu()
 
         func mainMenu() {
@@ -97,7 +107,7 @@ struct SwiftPlayground {
                 \nWelcome to Onslow Instrument Hire!
                 1. Stock management
                 2. Order management
-                3. Customer management
+                3. User management
                 4. Exit program
                 Please type the number of your desired option.
                 """, terminator: " ")
@@ -105,7 +115,7 @@ struct SwiftPlayground {
                 switch readLine() {
                     case "1": stockManagement()
                     case "2": print("Order management")
-                    case "3": print("Customer management")
+                    case "3": userManagement()
                     case "4": quit()
                     default: print("Please enter one of the options listed.\n")
                 }
@@ -352,6 +362,73 @@ struct SwiftPlayground {
                 }
             }
         }
+
+
+
+        //MARK: Order mgmt
+        func orderManagement() {
+
+        }
+
+
+
+        //MARK: User mgmt
+        func userManagement() {
+            while true {
+                print("""
+                \nUser Management
+                1. User list
+                2. Modify existing user
+                3. Add new user
+                4. Remove user
+                5. Return
+                Please type the number of your desired option.
+                """, terminator: " ")
+
+                switch readLine() {
+                    case "1": userSummary()
+                    case "2": userModify()
+                    case "3": print("Add new user")
+                    case "4": print("Remove user")
+                    case "5": mainMenu()
+                    default: print("Please enter one of the options listed.\n")
+                }
+            }
+        }
+
+
+        func userSummary() {
+            print()
+            for user in users {
+                print(user.userSum())
+            }
+        }
+
+
+        func userModify() {
+            print()
+            for user in users {
+                print(user.userSum())
+            }
+            print("Please enter a the users ID number.")
+            contin = false
+            while contin == false {
+                userText = readLine()!
+                if typeCheck(inputSTR: userText, type: "Int") == true {
+                    if Int(userText)! <= 0 || Int(userText)! > users.count {
+                        print("Invalid input.")
+                    } else {
+                        selIndex = Int(userText)!
+                        contin = true
+                    }
+                } else {
+                    print("Invalid input.")
+                }
+            }
+            
+        }
+
+
 
 
         func typeCheck(inputSTR: String, type: String) -> Bool{
