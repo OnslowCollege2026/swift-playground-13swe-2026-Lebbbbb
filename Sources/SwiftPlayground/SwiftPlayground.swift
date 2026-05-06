@@ -13,6 +13,7 @@ TODO!
 
 round(value * 100) / 100.0
 catagory for amps and stuff and ask user if they want an amp if theyre hiring an eletric gutair
+!!!!!!!!!!!!!!!!!ONCE CREATED HIRING SYSTEM when modifying stock/removing instrument check if there are any current hires
 */
 
 
@@ -34,14 +35,14 @@ struct Instrument {
     var totalUnavalable: Int {
         return rented + broken
     }
-    
+    var instType = ["Plucked string", "Bowed string", "Piano", "Brass", "Woodwind", "Percussion"]
 
     func instrumentSummary(totalOrAval: String) -> String {
         //return("\(id+1). A \(type) costs $\(price) per day. We have \(totalStock - rented - broken) avalable, \(rented) rented & \(broken) broken units")
         if totalOrAval == "avalable" {
             return("\(id+1). \(name) has \(totalStock - rented - broken) avalable currently, \(rented) rented,  \(broken) broken units & is a \(instType[family])")
         } else if totalOrAval == "total" {
-            return("\(id+1). \(name) has \(totalStock) total, \(rented) rented & \(broken) broken units")
+            return("\(id+1). \(name) has \(totalStock) total, \(rented) rented, \(broken) broken units & is a \(instType[family])")
         } else {
             print("CODE ERROR. instrumentSummary() passed incorrect information.")
             return("")
@@ -76,18 +77,18 @@ struct SwiftPlayground {
         /// misspelt as continue is a default var
         var contin = false
 
-        var instType = ["Plucked string", "Bowed string", "Piano", "Brass", "Woodwind", "Percussion"]
+        //var instType = ["Plucked string", "Bowed string", "Piano", "Brass", "Woodwind", "Percussion"]
 
         var instruments = [
-            Instrument(id: 0, name: "Acoustic Guitar", totalStock: 20, rented: 4, broken: 1, family: 1),
-            Instrument(id: 1, name: "Electric Guitar", totalStock: 6, rented: 1, broken: 0, family: 1)]
+            Instrument(id: 0, name: "Acoustic Guitar", totalStock: 20, rented: 4, broken: 1, family: 0),
+            Instrument(id: 1, name: "Electric Guitar", totalStock: 6, rented: 1, broken: 0, family: 0)]
 
         //var tempInst: [Any] = [-1, "TEMP", -1, -1, -1, -1]
-        var tempInst = Instrument(id: -1, name: "TEMP", totalStock: -1, rented: -1, broken: -1, family: -1)
+        var tempInst = Instrument(id: -1, name: "", totalStock: 0, rented: 0, broken: 0, family: 0)
         // used to reset back to default
-        let instDefault = Instrument(id: -1, name: "TEMP", totalStock: -1, rented: -1, broken: -1, family: -1)
+        let instDefault = Instrument(id: -1, name: "", totalStock: 0, rented: 0, broken: 0, family: 0)
 
-
+        print(tempInst.instType)
         mainMenu()
 
         func mainMenu() {
@@ -144,6 +145,8 @@ struct SwiftPlayground {
             print()
         }
 
+
+        // MARK: Modify inst
         func modifyInstrument() {
             print("\nNote: The total rented cannot be edited though this.")
             print("Please type the number for the instrument you want to modify")
@@ -231,10 +234,10 @@ struct SwiftPlayground {
                         } else if typeCheck(inputSTR: userText, type: "Int") == false {
                             print ("Please enter a whole positive number.")
                         } else if typeCheck(inputSTR: userText, type: "Int") == true {
-                            if Int(userText)! <= 0 || Int(userText)! > instType.count {
+                            if Int(userText)! <= 0 || Int(userText)! > tempInst.instType.count {
                                 print ("Please enter a valid entry.")
                             } else {
-                                tempInst.family = Int(userText)!
+                                tempInst.family = Int(userText)! - 1
                                 contin = true
                             }
                         }
@@ -253,10 +256,11 @@ struct SwiftPlayground {
             while contin == false {
                 userText = readLine()!
                 if userText.lowercased() == "y" || userText == "" {
-                    print("change")
+                    instruments[selIndex] = tempInst
+                    print("Instrument modified.")
                     contin = true
                 } else if userText.lowercased() == "n" {
-                    print("discard")
+                    print("Modification discarded.")
                     contin = true
                 } else {
                     print("Please enter Y/n")
@@ -266,8 +270,11 @@ struct SwiftPlayground {
         }
 
 
+        // MARK: Add inst
         func addInstrument() {
             print("\nCreating a new instrument")
+            tempInst = instDefault
+            tempInst.id = instruments.count
             contin = false
             while contin == false {
                 print("Name:", terminator: " ")
@@ -286,6 +293,7 @@ struct SwiftPlayground {
                 if typeCheck(inputSTR: userText, type: "Int") == true {
                     if Int(userText)! >= 0 {
                         tempInst.totalStock = Int(userText)!
+                        contin = true
                     } else {
                         print("Stock must be a positive whole number")
                     }
@@ -293,9 +301,56 @@ struct SwiftPlayground {
                     print("Stock must be a positive whole number")
                 }
             }
-            print(tempInst)
 
-            //make confirm screen beofre it saves, ask if user is sure they want one with 0 stock (if 0)
+            contin = false
+            while contin == false {
+                print("Broken units:", terminator: " ")
+                userText = readLine()!
+                if typeCheck(inputSTR: userText, type: "Int") == true {
+                    if Int(userText)! >= 0 && Int(userText)! <= tempInst.totalStock {
+                        tempInst.broken = Int(userText)!
+                        contin = true
+                    } else {
+                        print("Must be a positive whole number & not above total stock.")
+                    }
+                } else {
+                    print("Must be a positive whole number & not above total stock.")
+                }
+            }
+
+            contin = false
+            while contin == false {
+                listFamilies()
+                print("Family type:", terminator: " ")
+                userText = readLine()!
+                if typeCheck(inputSTR: userText, type: "Int") == true {
+                    if Int(userText)! <= 0 || Int(userText)! > tempInst.instType.count {
+                        print("Please enter a valid entry")
+                    } else {
+                        tempInst.family = Int(userText)! - 1
+                        contin = true
+                    }
+                } else {
+                    print("Please enter a valid entry")
+                }
+            }
+            
+            print("\n\(tempInst.instrumentSummary(totalOrAval: "total"))")
+            print("Would you like to create this instrument? Y/n")
+            contin = false
+            while contin == false {
+                userText = readLine()!
+                if userText.lowercased() == "y" || userText == "" {
+                    instruments.append(tempInst)
+                    print("Instrument created.")
+                    contin = true
+                } else if userText.lowercased() == "n" {
+                    print("Creation discarded.")
+                    contin = true
+                } else {
+                    print("Please enter Y/n")
+                }
+            }
         }
 
 
@@ -320,7 +375,7 @@ struct SwiftPlayground {
         }
 
         func listFamilies() {
-            for (index, item) in instType.enumerated() {
+            for (index, item) in tempInst.instType.enumerated() {
                 print("\(index + 1). \(item)")
             }
         }
