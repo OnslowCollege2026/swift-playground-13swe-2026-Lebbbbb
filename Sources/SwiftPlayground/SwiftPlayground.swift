@@ -17,6 +17,9 @@ catagory for amps and stuff and ask user if they want an amp if theyre hiring an
 
 cannot delete old records as will break loaning system sadly
 AAH!!!!!! using .count doesnt work if an item can be deleted cause then the ID's will be off...
+modify inst and othes may fuck up when selecting deleted index.. use filter to check if id exists!!!
+make search by instrument in loans
+ask user when deleting instrument with atleast 1 loan if they want to mark all loans for that as returned
 */
 
 
@@ -95,9 +98,10 @@ struct SwiftPlayground {
         //var instType = ["Plucked string", "Bowed string", "Piano", "Brass", "Woodwind", "Percussion"]
 
         var instruments = [
-            Instrument(id: 0, name: "Acoustic Guitar", totalStock: 20, rented: 4, broken: 1, family: 0),
-            Instrument(id: 1, name: "Electric Guitar", totalStock: 6, rented: 1, broken: 0, family: 0),
+            Instrument(id: 0, name: "Acoustic Guitar", totalStock: 20, rented: 2, broken: 1, family: 0),
+            Instrument(id: 1, name: "Electric Guitar", totalStock: 6, rented: 2, broken: 0, family: 0),
             Instrument(id: 2, name: "Grand Piano", totalStock: 0, rented: 0, broken: 0, family: 2)]
+        var totalIns: Int = 3
 
         //var tempInst: [Any] = [-1, "TEMP", -1, -1, -1, -1]
         var tempInst = Instrument(id: -1, name: "", totalStock: 0, rented: 0, broken: 0, family: 0)
@@ -160,12 +164,13 @@ struct SwiftPlayground {
                     case "1": stockSummary()
                     case "2": modifyInstrument()
                     case "3": addInstrument()
-                    case "4": print("Remove instrument")
+                    case "4": removeInst()
                     case "5": mainMenu()
                     default: print("Please enter one of the options listed.\n")
                 }
             }
         }
+
 
         func stockSummary() {
             print("\nStock summary.")
@@ -184,100 +189,103 @@ struct SwiftPlayground {
                 print((item.instrumentSummary(totalOrAval: "total")))
             }
             //selIndex = readLine()!
-            userText = readLine()!
-            if typeCheck(inputSTR: userText, type: "Int") == true {
-                if Int(userText)! > 0 && Int(userText)! < (instruments.count + 1) {
-                    selIndex = Int(userText)! - 1
-                    tempInst = instDefault
-                    tempInst.id = selIndex
-                    tempInst.rented = instruments[selIndex].rented
-
-                    contin = false
-                    while contin == false {
-                        print ("\nPlease enter a new name. Leave blank to leave it as \(instruments[selIndex].name).")
-                        userText = readLine()!
-                        if userText == "" {
-                            tempInst.name = instruments[selIndex].name
-                            contin = true
-                        } else if userText.count > maxInstName {
-                            print("Name too long. Must be under \(maxInstName + 1) characters.")
-                        } else {
-                            tempInst.name = userText
-                            //instruments[selIndex].name = userText
-                            contin = true
-                        }
+            tempInst = instDefault
+            contin = false
+            while contin == false {
+                userText = readLine()!
+                if typeCheck(inputSTR: userText, type: "Int") == true {
+                    if Int(userText)! > 0 && Int(userText)! < (instruments.endIndex) {
+                        selIndex = Int(userText)! - 1
+                        tempInst.id = selIndex
+                        tempInst.rented = instruments[selIndex].rented
+                        contin = true
+                    } else {
+                        print("Please enter a valid entry.")
                     }
-
-                    contin = false
-                    while contin == false {
-                        print ("\nPlease enter a new amount of broken units. Leave blank to leave it as \(instruments[selIndex].broken).")
-                        userText = readLine()!
-                        if userText == "" {
-                            tempInst.broken = instruments[selIndex].broken
-                            contin = true
-                        } else if typeCheck(inputSTR: userText, type: "Int") == false {
-                            print ("Please enter a whole positive number.")
-                        } else if typeCheck(inputSTR: userText, type: "Int") == true {
-                            if Int(userText)! >= 0 {
-                                if Int(userText)! > (instruments[selIndex].totalStock - instruments[selIndex].rented) {
-                                    print ("Cannot enter number higher than total avalable stock (\(instruments[selIndex].totalNotRented))")
-                                } else {
-                                    tempInst.broken = Int(userText)!
-                                    //instruments[selIndex].broken = Int(userText)!
-                                    contin = true
-                                }
-                            } else if Int(userText)! < 0 {
-                                print ("Please enter a whole positive number.")
-                            }
-                        }
-                    }
-
-                    contin = false
-                    while contin == false {
-                        print ("\nPlease enter a new total stock amount. Leave blank to leave it as \(instruments[selIndex].totalStock).")
-                        userText = readLine()!
-                        if userText == "" {
-                            tempInst.totalStock = instruments[selIndex].totalStock
-                            contin = true
-                        } else if typeCheck(inputSTR: userText, type: "Int") == false {
-                            print ("Please enter a whole positive number.")
-                        } else if typeCheck(inputSTR: userText, type: "Int") == true {
-                            if Int(userText)! - instruments[selIndex].totalUnavalable >= 0 {
-                                tempInst.totalStock = Int(userText)!
-                                //instruments[selIndex].totalStock = Int(userText)!
-                                contin = true
-                            } else {
-                                print("New stock cannot be below 0 or total unavalable units. (\(instruments[selIndex].totalUnavalable))")
-                            }
-                        }
-                    }
-
-                    contin = false
-                    while contin == false {
-                        print("\nPlease enter a new family type. Leave blank to leave it as \(instruments[selIndex].family).")
-                        listFamilies()
-                        //print("Leave blank to leave as \(instruments[selIndex].family).\nNew family:", terminator: " ")
-                        userText = readLine()!
-                        if userText == "" {
-                            tempInst.family = instruments[selIndex].family
-                            contin = true
-                        } else if typeCheck(inputSTR: userText, type: "Int") == false {
-                            print ("Please enter a whole positive number.")
-                        } else if typeCheck(inputSTR: userText, type: "Int") == true {
-                            if Int(userText)! <= 0 || Int(userText)! > tempInst.instType.count {
-                                print ("Please enter a valid entry.")
-                            } else {
-                                tempInst.family = Int(userText)! - 1
-                                contin = true
-                            }
-                        }
-                    }
-
                 } else {
                     print("Please enter a valid entry.")
                 }
-            } else {
-                print("Please enter a valid entry.")
+            }
+
+            contin = false
+            while contin == false {
+                print ("\nPlease enter a new name. Leave blank to leave it as \(instruments[selIndex].name).")
+                userText = readLine()!
+                if userText == "" {
+                    tempInst.name = instruments[selIndex].name
+                    contin = true
+                } else if userText.count > maxInstName {
+                    print("Name too long. Must be under \(maxInstName + 1) characters.")
+                } else {
+                    tempInst.name = userText
+                    //instruments[selIndex].name = userText
+                    contin = true
+                }
+            }
+
+            contin = false
+            while contin == false {
+                print ("\nPlease enter a new amount of broken units. Leave blank to leave it as \(instruments[selIndex].broken).")
+                userText = readLine()!
+                if userText == "" {
+                    tempInst.broken = instruments[selIndex].broken
+                    contin = true
+                } else if typeCheck(inputSTR: userText, type: "Int") == false {
+                    print ("Please enter a whole positive number.")
+                } else if typeCheck(inputSTR: userText, type: "Int") == true {
+                    if Int(userText)! >= 0 {
+                        if Int(userText)! > (instruments[selIndex].totalStock - instruments[selIndex].rented) {
+                            print ("Cannot enter number higher than total avalable stock (\(instruments[selIndex].totalNotRented))")
+                        } else {
+                            tempInst.broken = Int(userText)!
+                            //instruments[selIndex].broken = Int(userText)!
+                            contin = true
+                        }
+                    } else if Int(userText)! < 0 {
+                        print ("Please enter a whole positive number.")
+                    }
+                }
+            }
+
+            contin = false
+            while contin == false {
+                print ("\nPlease enter a new total stock amount. Leave blank to leave it as \(instruments[selIndex].totalStock).")
+                userText = readLine()!
+                if userText == "" {
+                    tempInst.totalStock = instruments[selIndex].totalStock
+                    contin = true
+                } else if typeCheck(inputSTR: userText, type: "Int") == false {
+                    print ("Please enter a whole positive number.")
+                } else if typeCheck(inputSTR: userText, type: "Int") == true {
+                    if Int(userText)! - instruments[selIndex].totalUnavalable >= 0 {
+                        tempInst.totalStock = Int(userText)!
+                        //instruments[selIndex].totalStock = Int(userText)!
+                        contin = true
+                    } else {
+                        print("New stock cannot be below 0 or total unavalable units. (\(instruments[selIndex].totalUnavalable))")
+                    }
+                }
+            }
+
+            contin = false
+            while contin == false {
+                print("\nPlease enter a new family type. Leave blank to leave it as \(instruments[selIndex].family).")
+                listFamilies()
+                //print("Leave blank to leave as \(instruments[selIndex].family).\nNew family:", terminator: " ")
+                userText = readLine()!
+                if userText == "" {
+                    tempInst.family = instruments[selIndex].family
+                    contin = true
+                } else if typeCheck(inputSTR: userText, type: "Int") == false {
+                    print ("Please enter a whole positive number.")
+                } else if typeCheck(inputSTR: userText, type: "Int") == true {
+                    if Int(userText)! <= 0 || Int(userText)! > tempInst.instType.count {
+                        print ("Please enter a valid entry.")
+                    } else {
+                        tempInst.family = Int(userText)! - 1
+                        contin = true
+                    }
+                }
             }
 
             contin = false
@@ -304,7 +312,7 @@ struct SwiftPlayground {
         func addInstrument() {
             print("\nCreating a new instrument")
             tempInst = instDefault
-            tempInst.id = instruments.count
+            tempInst.id = instruments.endIndex
             contin = false
             while contin == false {
                 print("Name:", terminator: " ")
@@ -384,6 +392,56 @@ struct SwiftPlayground {
         }
 
 
+        //MARK: Remove inst
+        func removeInst() {
+            print("\nRemove instrument")
+            for item in instruments {
+                print((item.instrumentSummary(totalOrAval: "total")))
+            }
+            contin = false
+            while contin == false {
+                print("ID of instrument to remove: ", terminator: "")
+                userText = readLine()!
+                if typeCheck(inputSTR: userText, type: "Int") == true {
+                    print((instruments.filter { $0.id == (Int(userText)! - 1) }))
+                    if (instruments.filter { $0.id == (Int(userText)! - 1) }).count == 1 {
+                        //selIndex = Int(userText)! - 1
+                        //let selected = (instruments.filter { $0.id == (Int(userText)! - 1) })
+                        print(instruments.indices.filter { instruments[$0].id == (Int(userText)! - 1) })
+                        selIndex = (instruments.indices.filter { instruments[$0].id == (Int(userText)! - 1) })[0]
+                        if instruments[selIndex].rented > 0 {
+                            print("Cannot remove instrument with active loans.")
+                        } else {
+                            contin = true
+                        }
+                    } else {
+                        print("Please select a valid id.")
+                    }
+                } else {
+                    print("Please select a valid id.")
+                }
+            }
+
+            print("\n\(instruments[selIndex].instrumentSummary(totalOrAval: "total"))")
+            print("Are you sure you want to delete this instrument? Y/n")
+            contin = false
+            while contin == false {
+                userText = readLine()!
+                if userText.lowercased() == "y" || userText == "" {
+                    instruments.remove(at: selIndex)
+                    print("Instrument removed.")
+                    contin = true
+                } else if userText.lowercased() == "n" {
+                    print("Removal discarded.")
+                    contin = true
+                } else {
+                    print("Please enter Y/n")
+                }
+            }
+        }
+
+
+
 
         //MARK: == Loan mgmt ==
         func orderManagement() {
@@ -454,7 +512,7 @@ struct SwiftPlayground {
                 print("Enter the user ID you want to search: ", terminator: "")
                 userText = readLine()!
                 if typeCheck(inputSTR: userText, type: "Int") == true {
-                    if Int(userText)! <= 0 || Int(userText)! > users.count {
+                    if Int(userText)! <= 0 || Int(userText)! > instruments.endIndex {
                         print("")
                     } else {
                         selIndex = Int(userText)! - 1
