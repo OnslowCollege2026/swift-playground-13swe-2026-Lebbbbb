@@ -3,22 +3,6 @@
 // Music Instrument rental
 import Foundation
 
-/*
-TODO!
-- Instruments, alavalble stock, amount being repaired, price
-- Purchaser list
-- Orders
-
-- put in hard data, make a toggle in code to enable/disable
-
-round(value * 100) / 100.0
-catagory for amps and stuff and ask user if they want an amp if theyre hiring an eletric gutair
-!!!!!!!!!!!!!!!!!ONCE CREATED HIRING SYSTEM when modifying stock/removing instrument check if there are any current hires
-
-
-ask user when deleting instrument with atleast 1 loan if they want to mark all loans for that as returned
-*/
-
 
 /// Instrument type and stock
 struct Instrument {
@@ -44,8 +28,8 @@ struct Instrument {
     }
     var instType = ["Plucked string", "Bowed string", "Piano", "Brass", "Woodwind", "Percussion"]
 
+    /// prints a summary based on incoming args
     func instrumentSummary(totalOrAval: String) -> String {
-        //return("\(id+1). A \(type) costs $\(price) per day. We have \(totalStock - rented - broken) avalable, \(rented) rented & \(broken) broken units")
         if totalOrAval == "avalable" {
             return("\(id+1). \(name) has \(totalStock - rented - broken) avalable currently, \(rented) rented,  \(broken) broken units & is a \(instType[family])")
         } else if totalOrAval == "total" {
@@ -57,16 +41,13 @@ struct Instrument {
     }
 }
 
+
+
+// i ran into scope issues having the summaries in thes next 2 structs directly
 struct User {
     var id: Int
     var name: String
     var email: String
-    //var phoneNum: String
-    //var adress: String
-
-    // func userSum() -> String {
-    //     return("\(id+1). \(name), \(email) has  loans")
-    // }
 }
 
 struct Loan {
@@ -74,8 +55,6 @@ struct Loan {
     var userID: Int
     var itemID: Int
     var returned: Bool
-
-
 }
 
 
@@ -83,34 +62,30 @@ struct Loan {
 @main
 struct SwiftPlayground {
     static func main() {
-        let maxInstName = 40
-        let maxUserName = 40
+        let maxInstName = 40 //maximum characters for an instrument name
+        let maxUserName = 40 //maximum characters for a users name
+
+        // temp variables i use
         var userText = ""
         var selIndex = -1
         var selIndex1 = -1
-        //var counter = 0
-        /// misspelt as continue is a default var
+
+        /// misspelt cause continue is a default var in swift
         var contin = false
 
-        //var instType = ["Plucked string", "Bowed string", "Piano", "Brass", "Woodwind", "Percussion"]
-
+        // instrument data
         var instruments = [
             Instrument(id: 0, name: "Acoustic Guitar", totalStock: 20, rented: 2, broken: 1, family: 0),
             Instrument(id: 1, name: "Electric Guitar", totalStock: 6, rented: 2, broken: 0, family: 0),
             Instrument(id: 2, name: "Grand Piano", totalStock: 0, rented: 0, broken: 0, family: 2)]
 
-        //var tempInst: [Any] = [-1, "TEMP", -1, -1, -1, -1]
-        var tempInst = Instrument(id: -1, name: "", totalStock: 0, rented: 0, broken: 0, family: 0)
-        // used to reset back to default
-        let instDefault = Instrument(id: -1, name: "", totalStock: 0, rented: 0, broken: 0, family: 0)
-
-        var tempUser = User(id: 0, name: "", email: "")
-
+        // user data
         var users = [
             User(id: 0, name: "Leb", email: "leb@leb.com"),
             User(id: 1, name: "Millie", email: "millie@millie.com"),
             User(id: 2, name: "Phoebe", email: "phoebe@phoebe.com")]
 
+        //loan data
         var loans = [
             Loan(id: 0, userID: 0, itemID: 1, returned: false),
             Loan(id: 1, userID: 0, itemID: 0, returned: false),
@@ -118,7 +93,15 @@ struct SwiftPlayground {
             Loan(id: 3, userID: 0, itemID: 0, returned: false)
         ]
 
+        // temp arrays used for confirming changes
+        var tempInst = Instrument(id: -1, name: "", totalStock: 0, rented: 0, broken: 0, family: 0)
+        let instDefault = Instrument(id: -1, name: "", totalStock: 0, rented: 0, broken: 0, family: 0)
+        var tempUser = User(id: 0, name: "", email: "")
+
+
+        // the only non variable defining non function code. waow
         mainMenu()
+
 
         ///MARK: == Main Menu ==
         func mainMenu() {
@@ -168,6 +151,7 @@ struct SwiftPlayground {
         }
 
 
+        /// prints summary of all stock
         func stockSummary() {
             print("\nStock summary.")
             for item in instruments {
@@ -177,19 +161,20 @@ struct SwiftPlayground {
         }
 
 
-        // MARK: Modify inst
+        /// MARK: Modify inst
         func modifyInstrument() {
             print("\nNote: The total rented cannot be edited though this.")
             print("Please type the number for the instrument you want to modify")
             for item in instruments {
                 print((item.instrumentSummary(totalOrAval: "total")))
             }
-            //selIndex = readLine()!
             tempInst = instDefault
             contin = false
+            // loops til valid ID selected/exited
             while contin == false {
                 userText = readLine()!
                 if typeCheck(inputSTR: userText, type: "Int") == true {
+                    // finds if user inputted a valid id
                     if (instruments.filter { $0.id == (Int(userText)! - 1) }).count == 1 {
                         selIndex = (instruments.indices.filter { instruments[$0].id == (Int(userText)! - 1) })[0]
                         tempInst.id = selIndex
@@ -203,22 +188,25 @@ struct SwiftPlayground {
                 }
             }
 
+            // new name selection
             contin = false
             while contin == false {
                 print ("\nPlease enter a new name. Leave blank to leave it as \(instruments[selIndex].name).")
                 userText = readLine()!
+                // if text blank then keep the original name
                 if userText == "" {
                     tempInst.name = instruments[selIndex].name
                     contin = true
+                // name cant be over 40 characters
                 } else if userText.count > maxInstName {
                     print("Name too long. Must be under \(maxInstName + 1) characters.")
                 } else {
                     tempInst.name = userText
-                    //instruments[selIndex].name = userText
                     contin = true
                 }
             }
 
+            // new amount of broken. this is before total stock as totalstock cant be below amount of broken units
             contin = false
             while contin == false {
                 print ("\nPlease enter a new amount of broken units. Leave blank to leave it as \(instruments[selIndex].broken).")
@@ -230,11 +218,11 @@ struct SwiftPlayground {
                     print ("Please enter a whole positive number.")
                 } else if typeCheck(inputSTR: userText, type: "Int") == true {
                     if Int(userText)! >= 0 {
+                        // number is invalid if there are more broken than total stock - loaned
                         if Int(userText)! > (instruments[selIndex].totalStock - instruments[selIndex].rented) {
                             print ("Cannot enter number higher than total avalable stock (\(instruments[selIndex].totalNotRented))")
                         } else {
                             tempInst.broken = Int(userText)!
-                            //instruments[selIndex].broken = Int(userText)!
                             contin = true
                         }
                     } else if Int(userText)! < 0 {
@@ -243,6 +231,7 @@ struct SwiftPlayground {
                 }
             }
 
+            // new total stock
             contin = false
             while contin == false {
                 print ("\nPlease enter a new total stock amount. Leave blank to leave it as \(instruments[selIndex].totalStock).")
@@ -255,7 +244,6 @@ struct SwiftPlayground {
                 } else if typeCheck(inputSTR: userText, type: "Int") == true {
                     if Int(userText)! - instruments[selIndex].totalUnavalable >= 0 {
                         tempInst.totalStock = Int(userText)!
-                        //instruments[selIndex].totalStock = Int(userText)!
                         contin = true
                     } else {
                         print("New stock cannot be below 0 or total unavalable units. (\(instruments[selIndex].totalUnavalable))")
@@ -263,11 +251,11 @@ struct SwiftPlayground {
                 }
             }
 
+            // new family type
             contin = false
             while contin == false {
                 print("\nPlease enter a new family type. Leave blank to leave it as \(instruments[selIndex].family).")
                 listFamilies()
-                //print("Leave blank to leave as \(instruments[selIndex].family).\nNew family:", terminator: " ")
                 userText = readLine()!
                 if userText == "" {
                     tempInst.family = instruments[selIndex].family
@@ -275,15 +263,18 @@ struct SwiftPlayground {
                 } else if typeCheck(inputSTR: userText, type: "Int") == false {
                     print ("Please enter a whole positive number.")
                 } else if typeCheck(inputSTR: userText, type: "Int") == true {
+                    // checks if number is out of the index
                     if Int(userText)! <= 0 || Int(userText)! > tempInst.instType.count {
                         print ("Please enter a valid entry.")
                     } else {
+                        // -1 like most things ive done, the ID's get printed at +1
                         tempInst.family = Int(userText)! - 1
                         contin = true
                     }
                 }
             }
 
+            // asks user if they want to confirm the changes
             contin = false
             print("\n\(tempInst.instrumentSummary(totalOrAval: "total"))")
             print("Confirm your changes? Y/n")
@@ -300,7 +291,6 @@ struct SwiftPlayground {
                     print("Please enter Y/n")
                 }
             }
-            //print("DEBUG \(instruments[0].instrumentSummary(totalOrAval: "avalable"))")
         }
 
 
@@ -310,6 +300,7 @@ struct SwiftPlayground {
             tempInst = instDefault
             tempInst.id = instruments.endIndex
             contin = false
+            // Asks for name
             while contin == false {
                 print("Name:", terminator: " ")
                 userText = readLine()!
@@ -320,10 +311,12 @@ struct SwiftPlayground {
                     contin = true
                 }
             }
+            // Asks for stock count
             contin = false
             while contin == false {
                 print("Stock:", terminator: " ")
                 userText = readLine()!
+                // checks if input is an int
                 if typeCheck(inputSTR: userText, type: "Int") == true {
                     if Int(userText)! >= 0 {
                         tempInst.totalStock = Int(userText)!
@@ -335,12 +328,13 @@ struct SwiftPlayground {
                     print("Stock must be a positive whole number")
                 }
             }
-
+            // Asks for amount of broken units
             contin = false
             while contin == false {
                 print("Broken units:", terminator: " ")
                 userText = readLine()!
                 if typeCheck(inputSTR: userText, type: "Int") == true {
+                    // if the input isnt above the total stock then it continues
                     if Int(userText)! >= 0 && Int(userText)! <= tempInst.totalStock {
                         tempInst.broken = Int(userText)!
                         contin = true
@@ -351,13 +345,14 @@ struct SwiftPlayground {
                     print("Must be a positive whole number & not above total stock.")
                 }
             }
-
+            // asks for instrument family type
             contin = false
             while contin == false {
                 listFamilies()
                 print("Family type:", terminator: " ")
                 userText = readLine()!
                 if typeCheck(inputSTR: userText, type: "Int") == true {
+                    // checks if its a valid index in the family types
                     if Int(userText)! <= 0 || Int(userText)! > tempInst.instType.count {
                         print("Please enter a valid entry")
                     } else {
@@ -369,6 +364,7 @@ struct SwiftPlayground {
                 }
             }
             
+            // confirm with user if they want to create this instrument
             print("\n\(tempInst.instrumentSummary(totalOrAval: "total"))")
             print("Would you like to create this instrument? Y/n")
             contin = false
@@ -391,6 +387,7 @@ struct SwiftPlayground {
         //MARK: Remove inst
         func removeInst() {
             print("\nRemove instrument. Enter a blank field to exit.")
+            // print all instruments
             for item in instruments {
                 print((item.instrumentSummary(totalOrAval: "total")))
             }
@@ -399,8 +396,10 @@ struct SwiftPlayground {
                 print("ID of instrument to remove: ", terminator: "")
                 userText = readLine()!
                 if typeCheck(inputSTR: userText, type: "Int") == true {
+                    // checks if the user input is a valid id
                     if (instruments.filter { $0.id == (Int(userText)! - 1) }).count == 1 {
                         selIndex = (instruments.indices.filter { instruments[$0].id == (Int(userText)! - 1) })[0]
+                        // checks if the selected instrument has any loans logged
                         if instruments[selIndex].rented > 0 {
                             print("Cannot remove instrument with active loans. Please return item(s) & prune logs before trying again.")
                         } else {
@@ -416,6 +415,7 @@ struct SwiftPlayground {
                 }
             }
 
+            // asks user for confirmation if theyd like to remove the instrument
             print("\n\(instruments[selIndex].instrumentSummary(totalOrAval: "total"))")
             print("Are you sure you want to delete this instrument? Y/n")
             contin = false
@@ -461,18 +461,6 @@ struct SwiftPlayground {
             }
         }
 
-        func loanSum(lID: Int, yellIfReturned: Bool) -> String {
-            if yellIfReturned == true {
-                if loans[lID].returned == true {
-                    return("ID: \(loans[lID].id) held by \(users[loans[lID].id].name) has been returned.")
-                } else {
-                    return("ID: \(loans[lID].id) held by \(users[loans[lID].id].name) has NOT been returned.")
-                }
-            } else {
-                return("ID: \(loans[lID].id) held by \(users[loans[lID].id].name) took out a \(instruments[loans[lID].itemID].name).")
-            }
-        }
-
 
         ///MARK: Search Loans
         func searchLoans() {
@@ -492,6 +480,7 @@ struct SwiftPlayground {
             }
         }
 
+        // lists current non returned loans
         func listCurrent() {
             print("\nCurrent loans:")
             let notReturned = loans.filter { $0.returned == false }
@@ -500,9 +489,12 @@ struct SwiftPlayground {
             }
         }
 
+
+        // lists loans from spesific user
         func listFromUser() {
             print("\nList from user")
             userSummary(uID: -1)
+            // generic user selection code, same as previous instances
             contin = false
             while contin == false {
                 print("Enter the user ID you want to search: ", terminator: "")
@@ -520,11 +512,14 @@ struct SwiftPlayground {
             }
 
             print("\nSelected \(users[selIndex].name)")
+            // filters down to only the loans the user has taken
             let userInspection = loans.filter { $0.userID == selIndex }
+            // if user has no loans logged it states that
             if userInspection.count == 0 {
                 print("\(users[selIndex].name) has no logged loans.")
             } else {
                 for loan in userInspection {
+                    // different print message if loan has/hasnt been returned
                     if loan.returned == true {
                         print("ID: \(loan.id). \(users[loan.userID].name) took out a \(instruments[loan.itemID].name) and has returned it.")
                     } else {
@@ -535,11 +530,14 @@ struct SwiftPlayground {
         }
 
 
+
+        // Lists all loans from spesific instrument. very simelar code to previous.
         func listFromInst() {
             print("Please type the number for the instrument you want to search")
             for item in instruments {
                 print((item.instrumentSummary(totalOrAval: "total")))
             }
+            // generic instrument selection code
             contin = false
             while contin == false {
                 userText = readLine()!
@@ -578,6 +576,7 @@ struct SwiftPlayground {
         func newLoan() {
             print("\nNew loan")
             userSummary(uID: -1)
+            // generic user id selection
             contin = false
             while contin == false {
                 print("Enter the user ID the loan is from: ", terminator: "")
@@ -595,6 +594,7 @@ struct SwiftPlayground {
             }
 
             print()
+            // prints all instruments
             for item in instruments {
                 print((item.instrumentSummary(totalOrAval: "avalable")))
             }
@@ -603,8 +603,10 @@ struct SwiftPlayground {
                 print("Enter the instrument ID to borrow: ", terminator: "")
                 userText = readLine()!
                 if typeCheck(inputSTR: userText, type: "Int") == true {
+                    // checks if selection is in index
                     if Int(userText)! <= 0 || Int(userText)! > instruments.count {
-                        print()
+                        print("Selected instrument must have alteast 1 avalable.  Enter a blank field to exit.")
+                    // doesnt select instrument if it doesnt have any avalable
                     } else if instruments[Int(userText)! - 1].totalAval <= 0 {
                         print("Selected instrument must have alteast 1 avalable.  Enter a blank field to exit.")
                     } else {
@@ -617,14 +619,16 @@ struct SwiftPlayground {
                     print()
                 }
             }
-
+            // confirms if user wants to confirm the loan
             print("\(users[selIndex].name) borrowing \(instruments[selIndex1].name)")
             print("Would you like to confirm this loan? Y/n")
             contin = false
             while contin == false {
                 userText = readLine()!
                 if userText.lowercased() == "y" || userText == "" {
+                    // adds 1 to instruments being loaned
                     instruments[selIndex1].rented = instruments[selIndex1].rented + 1
+                    // logs loan in the array
                     loans.append(Loan(id: (loans.count), userID: selIndex, itemID: selIndex1, returned: false))
                     print("Item loaned.")
                     contin = true
@@ -642,9 +646,11 @@ struct SwiftPlayground {
         func returnLoan() {
             print("\nReturn loan")
             let notReturned = loans.filter { $0.returned == false }
+            // prints all non reutnred loans
             for loan in notReturned {
                 print("ID: \(loan.id) held by \(users[loan.userID].name) who took out a \(instruments[loan.itemID].name).")
             }
+            // ID selection below
             contin = false
             while contin == false {
                 print("Please enter the loan ID you would like to return")
@@ -661,14 +667,16 @@ struct SwiftPlayground {
                     print("Please enter a valid loan ID")
                 }
             }
-
+            // user confirmation
             print("\nID: \(loans[selIndex].id) held by \(users[loans[selIndex].userID].name) who took out a \(instruments[loans[selIndex].itemID].name).")
             print("Would you like to confirm this return? Y/n")
             contin = false
             while contin == false {
                 userText = readLine()!
                 if userText.lowercased() == "y" || userText == "" {
+                    // selindex1 used for the itemID
                     selIndex1 = loans[selIndex].itemID
+                    // removes from total rented
                     instruments[selIndex1].rented = instruments[selIndex1].rented - 1
                     loans[selIndex].returned = true
                     print("Return confirmed.")
@@ -686,6 +694,7 @@ struct SwiftPlayground {
         //MARK: Prune loans
         func pruneLoans() {
             print("\nPrune loans")
+            // gets all loans that have been returned
             let returnedLoans = loans.indices.filter { loans[$0].returned == true }
             if returnedLoans.count == 0 {
                 print("All loans have been returned.")
@@ -694,14 +703,14 @@ struct SwiftPlayground {
                     print("ID: \(loans[loan].id). \(users[loans[loan].userID].name) took out a \(instruments[loans[loan].itemID].name)")
                 }
 
-                // not Y/n to prevent potential mistakes
+                // not Y/n to prevent potential user error
                 print("Would you like to delete all returned logs? y/n\nTHIS ACTION CAN NOT BE REVERSED")
                 contin = false
                 while contin == false {
                     userText = readLine()!
                     if userText.lowercased() == "y" {
+                        // removes all returned loans
                         for loan in returnedLoans {
-                            //print(loans[loan])
                             loans.remove(at: loan)
                         }
                         print("Deleted returned loans.")
@@ -745,13 +754,15 @@ struct SwiftPlayground {
 
 
         func userSummary(uID: Int) {
-            //print()
+            // if uID = -1 then it prints summary for all users. otherwise it uses uID as the user ID to get the summary for
             if uID == -1 {
                 for user in users {
+                    // gets total current loans of the selected user
                     let currentLoans = loans.filter { $0.userID == user.id && $0.returned == false }
                     print("\(user.id+1). \(user.name), \(user.email) has \(currentLoans.count) current loans")
                 }
             } else {
+                // gets total current loans of the selected user
                 let currentLoans = loans.filter { $0.userID == users[selIndex].id && $0.returned == false }
                 print("\(users[uID].id+1). \(users[uID].name), \(users[uID].email) has \(currentLoans.count) current loans")
             }
@@ -763,6 +774,7 @@ struct SwiftPlayground {
             print()
             userSummary(uID: -1)
             print("Please enter a users ID number.")
+            // generic select user code
             contin = false
             while contin == false {
                 userText = readLine()!
@@ -779,6 +791,7 @@ struct SwiftPlayground {
                 }
             }
 
+            // new name for user
             print("Please enter a new name. Leave blank to keep as \(users[selIndex].name)")
             contin = false
             while contin == false {
@@ -786,6 +799,7 @@ struct SwiftPlayground {
                 if userText == "" {
                     tempUser.name = users[selIndex].name
                     contin = true
+                // checks if name is in the character limit
                 } else if userText.count < 0 && userText.count > maxUserName {
                     print("Name must be between 0 & \(maxUserName + 1) characters.")
                 } else {
@@ -794,6 +808,7 @@ struct SwiftPlayground {
                 }
             }
             
+            // new email adress
             print("Please enter a new email. Leave blank to keep as \(users[selIndex].email)")
             contin = false
             while contin == false {
@@ -801,12 +816,15 @@ struct SwiftPlayground {
                 if userText == "" {
                     tempUser.email = users[selIndex].email
                     contin = true
+                } else if userText.count > 320 {
+                    print("Email adress not possible.")
                 } else {
                     tempUser.email = userText
                     contin = true
                 }
             }
 
+            // asks if user wants to confirm the changes
             print("\(tempUser.id+1). \(tempUser.name), \(tempUser.email)")
             print("Confirm these changes? Y/n")
             contin = false
@@ -829,8 +847,10 @@ struct SwiftPlayground {
         //MARK: Add user
         func addUser() {
             print("\nAdd new user")
+            // gets next userID
             tempUser.id = users.last!.id + 1
             contin = false
+            // asks for name within bounds
             while contin == false {
                 print("Name: ", terminator: "")
                 userText = readLine()!
@@ -842,6 +862,7 @@ struct SwiftPlayground {
                 }
             }
 
+            // asks for email within bounds
             contin = false
             while contin == false {
                 print("Email: ", terminator: "")
@@ -877,10 +898,10 @@ struct SwiftPlayground {
 
         //MARK: Remove user
         func removeUser() {
-            //make sure doesnt delete user with active loans
             print("\nRemove user")
             userSummary(uID: -1)
             print("Please enter a users ID number. Enter a blank field to exit.")
+            // generic user selection code
             contin = false
             while contin == false {
                 userText = readLine()!
@@ -898,6 +919,7 @@ struct SwiftPlayground {
                 }
             }
 
+            // checks if user has current or previous loans. they must be removed first due to crashing issues
             if (loans.filter { $0.userID == users[selIndex].id }.count) != 0 {
                 print("Cannot remove user with logged loans. Please return item(s) & prune logs before trying again.")
             } else {
@@ -921,7 +943,8 @@ struct SwiftPlayground {
         }
 
 
-
+        // there are no double values here, but this was added when there was one. Hasnt been removed incase i need it again
+        /// either "Int" or "Double". Checks if the provided string conforms to the spesified type
         func typeCheck(inputSTR: String, type: String) -> Bool{
             if type == "Int" {
                 if let _ = Int(inputSTR) {
@@ -942,13 +965,14 @@ struct SwiftPlayground {
             }
         }
 
+        /// Lists all instrument families
         func listFamilies() {
             for (index, item) in tempInst.instType.enumerated() {
                 print("\(index + 1). \(item)")
             }
         }
 
-
+        // Quits program
         func quit() {
             print("Exiting.")
             exit(0)
