@@ -15,10 +15,7 @@ round(value * 100) / 100.0
 catagory for amps and stuff and ask user if they want an amp if theyre hiring an eletric gutair
 !!!!!!!!!!!!!!!!!ONCE CREATED HIRING SYSTEM when modifying stock/removing instrument check if there are any current hires
 
-cannot delete old records as will break loaning system sadly
-AAH!!!!!! using .count doesnt work if an item can be deleted cause then the ID's will be off...
-modify inst and othes may fuck up when selecting deleted index.. use filter to check if id exists!!!
-make search by instrument in loans
+
 ask user when deleting instrument with atleast 1 loan if they want to mark all loans for that as returned
 */
 
@@ -194,8 +191,8 @@ struct SwiftPlayground {
             while contin == false {
                 userText = readLine()!
                 if typeCheck(inputSTR: userText, type: "Int") == true {
-                    if Int(userText)! > 0 && Int(userText)! < (instruments.endIndex) {
-                        selIndex = Int(userText)! - 1
+                    if (instruments.filter { $0.id == (Int(userText)! - 1) }).count == 1 {
+                        selIndex = (instruments.indices.filter { instruments[$0].id == (Int(userText)! - 1) })[0]
                         tempInst.id = selIndex
                         tempInst.rented = instruments[selIndex].rented
                         contin = true
@@ -403,11 +400,7 @@ struct SwiftPlayground {
                 print("ID of instrument to remove: ", terminator: "")
                 userText = readLine()!
                 if typeCheck(inputSTR: userText, type: "Int") == true {
-                    print((instruments.filter { $0.id == (Int(userText)! - 1) }))
                     if (instruments.filter { $0.id == (Int(userText)! - 1) }).count == 1 {
-                        //selIndex = Int(userText)! - 1
-                        //let selected = (instruments.filter { $0.id == (Int(userText)! - 1) })
-                        print(instruments.indices.filter { instruments[$0].id == (Int(userText)! - 1) })
                         selIndex = (instruments.indices.filter { instruments[$0].id == (Int(userText)! - 1) })[0]
                         if instruments[selIndex].rented > 0 {
                             print("Cannot remove instrument with active loans.")
@@ -460,7 +453,7 @@ struct SwiftPlayground {
                     case "1": searchLoans()
                     case "2": newLoan()
                     case "3": returnLoan()
-                    case "4": print("4")
+                    case "4": pruneLoans()
                     case "5": mainMenu()
                     default: print("Please enter one of the options listed.\n")
                 }
@@ -486,12 +479,14 @@ struct SwiftPlayground {
             \nSearch loans
             1. List all current
             2. List from user
-            3. Return
+            3. List from instrument
+            4. Return
             """)
             switch readLine() {
                 case "1": listCurrent()
                 case "2": listFromUser()
-                case "3": orderManagement()
+                case "3": listFromInst()
+                case "4": orderManagement()
                 default: print("Please enter one of the options listed.\n")
             }
         }
@@ -512,21 +507,21 @@ struct SwiftPlayground {
                 print("Enter the user ID you want to search: ", terminator: "")
                 userText = readLine()!
                 if typeCheck(inputSTR: userText, type: "Int") == true {
-                    if Int(userText)! <= 0 || Int(userText)! > instruments.endIndex {
-                        print("")
-                    } else {
-                        selIndex = Int(userText)! - 1
+                    if (users.filter { $0.id  == (Int(userText)! - 1) }).count == 1 {
+                        selIndex = (users.indices.filter { users[$0].id == (Int(userText)! - 1) })[0]
                         contin = true
+                    } else {
+                        print("Please select a valid user ID.")
                     }
                 } else {
-                    print("")
+                    print("Please select a valid user ID.")
                 }
             }
 
             print("\nSelected \(users[selIndex].name)")
             let userInspection = loans.filter { $0.userID == selIndex }
             if userInspection.count == 0 {
-                print("\(users[selIndex].name) has no current or previous loans.")
+                print("\(users[selIndex].name) has no logged loans.")
             } else {
                 for loan in userInspection {
                     if loan.returned == true {
@@ -537,6 +532,44 @@ struct SwiftPlayground {
                 }
             }
         }
+
+
+        func listFromInst() {
+            print("Please type the number for the instrument you want to search")
+            for item in instruments {
+                print((item.instrumentSummary(totalOrAval: "total")))
+            }
+            contin = false
+            while contin == false {
+                userText = readLine()!
+                if typeCheck(inputSTR: userText, type: "Int") == true {
+                    if (instruments.filter { $0.id == (Int(userText)! - 1) }).count == 1 {
+                        selIndex = (instruments.indices.filter { instruments[$0].id == (Int(userText)! - 1) })[0]
+                        tempInst.id = selIndex
+                        tempInst.rented = instruments[selIndex].rented
+                        contin = true
+                    } else {
+                        print("Please enter a valid entry.")
+                    }
+                } else {
+                    print("Please enter a valid entry.")
+                }
+            }
+            
+            print("\nSelected: \(instruments[selIndex].name)")
+            let instInspection = loans.filter { $0.itemID == selIndex }
+            if instInspection.count == 0 {
+                print("\(instruments[selIndex].name) has no logged loans.")
+            }
+            for loan in instInspection {
+                if loan.returned == true {
+                    print("ID: \(loan.id). \(users[loan.userID].name) took out a \(instruments[loan.itemID].name) and has returned it.")
+                } else {
+                    print("ID: \(loan.id). \(users[loan.userID].name) took out a \(instruments[loan.itemID].name) and has NOT returned it.")
+                }
+            }
+        }
+
 
 
 
@@ -620,7 +653,7 @@ struct SwiftPlayground {
                         selIndex = Int(userText)!
                         contin = true
                     } else {
-                        print("Please enter a valid loan ID")
+                        print("Please enter a valid non-returned loan ID")
                     }
                 } else {
                     print("Please enter a valid loan ID")
@@ -645,9 +678,41 @@ struct SwiftPlayground {
                     print("Please enter Y/n")
                 }
             }
-
-
         }
+
+
+        //MARK: Prune loans
+        func pruneLoans() {
+            print("\nPrune loans")
+            let returnedLoans = loans.indices.filter { loans[$0].returned == true }
+            if returnedLoans.count == 0 {
+                print("All loans have been returned.")
+            } else {
+                for loan in returnedLoans {
+                    print("ID: \(loans[loan].id). \(users[loans[loan].userID].name) took out a \(instruments[loans[loan].itemID].name)")
+                }
+
+                // not Y/n to prevent potential mistakes
+                print("Would you like to delete all returned logs? y/n\nTHIS ACTION CAN NOT BE REVERSED")
+                contin = false
+                while contin == false {
+                    userText = readLine()!
+                    if userText.lowercased() == "y" {
+                        for loan in returnedLoans {
+                            loans.remove(at: loan)
+                        }
+                        print("Deleted returned loans.")
+                        contin = true
+                    } else if userText.lowercased() == "n" {
+                        print("Operation cancelled")
+                        contin = true
+                    } else {
+                        print("Please enter y/n")
+                    }
+                }
+            }
+        }
+
 
 
 
@@ -699,12 +764,12 @@ struct SwiftPlayground {
             while contin == false {
                 userText = readLine()!
                 if typeCheck(inputSTR: userText, type: "Int") == true {
-                    if Int(userText)! <= 0 || Int(userText)! > users.count {
-                        print("Invalid input.")
-                    } else {
-                        selIndex = Int(userText)! - 1
+                    if (users.filter { $0.id  == (Int(userText)! - 1) }).count == 1 {
+                        selIndex = (users.indices.filter { users[$0].id == (Int(userText)! - 1) })[0]
                         tempUser.id = selIndex
                         contin = true
+                    } else {
+                        print("Invalid input.")
                     }
                 } else {
                     print("Invalid input.")
