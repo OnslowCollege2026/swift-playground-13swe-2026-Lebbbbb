@@ -98,7 +98,6 @@ struct SwiftPlayground {
             Instrument(id: 0, name: "Acoustic Guitar", totalStock: 20, rented: 2, broken: 1, family: 0),
             Instrument(id: 1, name: "Electric Guitar", totalStock: 6, rented: 2, broken: 0, family: 0),
             Instrument(id: 2, name: "Grand Piano", totalStock: 0, rented: 0, broken: 0, family: 2)]
-        var totalIns: Int = 3
 
         //var tempInst: [Any] = [-1, "TEMP", -1, -1, -1, -1]
         var tempInst = Instrument(id: -1, name: "", totalStock: 0, rented: 0, broken: 0, family: 0)
@@ -391,7 +390,7 @@ struct SwiftPlayground {
 
         //MARK: Remove inst
         func removeInst() {
-            print("\nRemove instrument")
+            print("\nRemove instrument. Enter a blank field to exit.")
             for item in instruments {
                 print((item.instrumentSummary(totalOrAval: "total")))
             }
@@ -403,13 +402,15 @@ struct SwiftPlayground {
                     if (instruments.filter { $0.id == (Int(userText)! - 1) }).count == 1 {
                         selIndex = (instruments.indices.filter { instruments[$0].id == (Int(userText)! - 1) })[0]
                         if instruments[selIndex].rented > 0 {
-                            print("Cannot remove instrument with active loans.")
+                            print("Cannot remove instrument with active loans. Please return item(s) & prune logs before trying again.")
                         } else {
                             contin = true
                         }
                     } else {
                         print("Please select a valid id.")
                     }
+                } else if userText.count == 0{
+                    return
                 } else {
                     print("Please select a valid id.")
                 }
@@ -582,14 +583,14 @@ struct SwiftPlayground {
                 print("Enter the user ID the loan is from: ", terminator: "")
                 userText = readLine()!
                 if typeCheck(inputSTR: userText, type: "Int") == true {
-                    if Int(userText)! <= 0 || Int(userText)! > users.count {
-                        print("")
-                    } else {
-                        selIndex = Int(userText)! - 1
+                    if (users.filter { $0.id == (Int(userText)! - 1) }).count == 1 {
+                        selIndex = (users.indices.filter { users[$0].id == (Int(userText)! - 1) })[0]
                         contin = true
+                    } else {
+                        print("Please enter a valid id.")
                     }
                 } else {
-                    print("")
+                    print("Please enter a valid id.")
                 }
             }
 
@@ -604,13 +605,14 @@ struct SwiftPlayground {
                 if typeCheck(inputSTR: userText, type: "Int") == true {
                     if Int(userText)! <= 0 || Int(userText)! > instruments.count {
                         print()
-                    } else if instruments[Int(userText)! - 1].totalAval - 1 <= 0 {
-                        print("Selected instrument must have alteast 1 avalable.")
-                    }
-                    else {
+                    } else if instruments[Int(userText)! - 1].totalAval <= 0 {
+                        print("Selected instrument must have alteast 1 avalable.  Enter a blank field to exit.")
+                    } else {
                         selIndex1 = Int(userText)! - 1
                         contin = true
                     }
+                } else if userText.count == 0 {
+                    return
                 } else {
                     print()
                 }
@@ -699,6 +701,7 @@ struct SwiftPlayground {
                     userText = readLine()!
                     if userText.lowercased() == "y" {
                         for loan in returnedLoans {
+                            //print(loans[loan])
                             loans.remove(at: loan)
                         }
                         print("Deleted returned loans.")
@@ -732,8 +735,8 @@ struct SwiftPlayground {
                 switch readLine() {
                     case "1": userSummary(uID: -1)
                     case "2": userModify()
-                    case "3": print("Add new user")
-                    case "4": print("Remove user")
+                    case "3": addUser()
+                    case "4": removeUser()
                     case "5": mainMenu()
                     default: print("Please enter one of the options listed.\n")
                 }
@@ -759,7 +762,7 @@ struct SwiftPlayground {
         func userModify() {
             print()
             userSummary(uID: -1)
-            print("Please enter a the users ID number.")
+            print("Please enter a users ID number.")
             contin = false
             while contin == false {
                 userText = readLine()!
@@ -825,9 +828,97 @@ struct SwiftPlayground {
 
         //MARK: Add user
         func addUser() {
-            print("Add new user\nName")
+            print("\nAdd new user")
+            tempUser.id = users.last!.id + 1
+            contin = false
+            while contin == false {
+                print("Name: ", terminator: "")
+                userText = readLine()!
+                if userText.count == 0 || userText.count > maxUserName {
+                    print("Name must be between 0 & \(maxUserName + 1) characters.")
+                } else {
+                    tempUser.name = userText
+                    contin = true
+                }
+            }
+
+            contin = false
+            while contin == false {
+                print("Email: ", terminator: "")
+                userText = readLine()!
+                // 320 as most sources say thats the max chars for email. no minimum incase user email is unknown
+                if userText.count > 320 {
+                    print("Email adress not possible.")
+                } else {
+                    tempUser.email = userText
+                    contin = true
+                }
+            }
+
+            print("\n\(tempUser.id+1). \(tempUser.name), \(tempUser.email)")
+            print("Confirm add this user? Y/n")
+            contin = false
+            while contin == false {
+                userText = readLine()!
+                if userText.lowercased() == "y" || userText == "" {
+                    users.append(tempUser)
+                    print("User created.")
+                    contin = true
+                } else if userText.lowercased() == "n" {
+                    print("Creation discarded.")
+                    contin = true
+                } else {
+                    print("Please enter Y/n")
+                }
+            }
+
         }
 
+
+        //MARK: Remove user
+        func removeUser() {
+            //make sure doesnt delete user with active loans
+            print("\nRemove user")
+            userSummary(uID: -1)
+            print("Please enter a users ID number. Enter a blank field to exit.")
+            contin = false
+            while contin == false {
+                userText = readLine()!
+                if typeCheck(inputSTR: userText, type: "Int") == true {
+                    if (users.filter { $0.id  == (Int(userText)! - 1) }).count == 1 {
+                        selIndex = (users.indices.filter { users[$0].id == (Int(userText)! - 1) })[0]
+                        contin = true
+                    } else {
+                        print("Invalid input.")
+                    }
+                } else if userText == "" {
+                    return
+                } else {
+                    print("Invalid input.")
+                }
+            }
+
+            if (loans.filter { $0.userID == users[selIndex].id }.count) != 0 {
+                print("Cannot remove user with logged loans. Please return item(s) & prune logs before trying again.")
+            } else {
+                // not Y/n to prevent potential mistakes
+                print("Would you like to delete \(users[selIndex].name)? y/n\nTHIS ACTION CAN NOT BE REVERSED")
+                contin = false
+                while contin == false {
+                    userText = readLine()!
+                    if userText.lowercased() == "y" {
+                        users.remove(at: selIndex)
+                        print("Deleted user.")
+                        contin = true
+                    } else if userText.lowercased() == "n" {
+                        print("Operation cancelled")
+                        contin = true
+                    } else {
+                        print("Please enter y/n")
+                    }
+                }
+            }
+        }
 
 
 
